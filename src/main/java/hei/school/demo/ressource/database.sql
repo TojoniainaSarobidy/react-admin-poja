@@ -1,0 +1,3 @@
+CREATE DATABASE react_admin;
+CREATE USER react_admin_user WITH PASSWORD '123456';
+GRANT ALL PRIVILEGES ON SCHEMA PUBLIC TO react_admin_user;
