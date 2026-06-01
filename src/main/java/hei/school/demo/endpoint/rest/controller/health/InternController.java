@@ -32,4 +32,22 @@ public class InternController {
                 .header("Content-Type", "application/json")
                 .body(result);
     }
+
+    @PutMapping(value = "/intern/{idEmployee}")
+    public ResponseEntity<?> updateIntern(@RequestBody Intern intern, @PathVariable int idEmployee) {
+        Intern result = internService.updateIntern(intern, idEmployee);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header("Content-Type", "application/json")
+                .body(result);
+    }
+
+    @DeleteMapping(value = "/intern/{idIntern}")
+    public ResponseEntity<?> deleteIntern(@PathVariable int idIntern) {
+        String result = internService.deleteIntern(idIntern);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header("Content-Type", "application/json")
+                .body(result);
+    }
 }

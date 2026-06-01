@@ -88,4 +88,48 @@ public class InternRepository {
             dbConnection.getCloseConnection(connection);
         }
     }
+
+    public Intern updateIntern(Intern intern, int idEmployee) {
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = dbConnection.getDBConnection();
+        try {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE intern SET manager_id = ?, firstname = ?, lastname = ?, email = ?, school = ?, amount = ? WHERE id = ? RETURNING id"
+            )) {
+                preparedStatement.setInt(1, idEmployee);
+                preparedStatement.setString(2, intern.getFirstname());
+                preparedStatement.setString(3, intern.getLastname());
+                preparedStatement.setString(4, intern.getEmail());
+                preparedStatement.setString(5, intern.getSchool());
+                preparedStatement.setDouble(6, intern.getAmount());
+                preparedStatement.setInt(7, intern.getId());
+                try (ResultSet resultSet = preparedStatement.executeQuery();) {
+                    if (resultSet.next()) {
+                        resultSet.getInt("id");
+                    }
+                    connection.commit();
+                    return intern;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            dbConnection.getCloseConnection(connection);
+        }
+    }
+
+    public String deleteIntern(int idIntern) {
+        DBConnection dbConnection = new DBConnection();
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "DELETE FROM intern WHERE id = ?"
+             )) {
+            preparedStatement.setInt(1, idIntern);
+            preparedStatement.executeUpdate();
+            return "Intern deleted successfully";
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

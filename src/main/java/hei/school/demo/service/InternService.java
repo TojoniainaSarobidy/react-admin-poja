@@ -18,5 +18,15 @@ public class InternService {
         return internRepository.getAllInterns();
     }
 
-    public Intern createIntern(Intern intern, int idEmployee) {return internRepository.createIntern(intern, idEmployee);}
+    public Intern createIntern(Intern intern, int idEmployee) {
+        return internRepository.createIntern(intern, idEmployee);
+    }
+
+    public Intern updateIntern(Intern intern, int idEmployee) {
+        return internRepository.updateIntern(intern, idEmployee);
+    }
+
+    public String deleteIntern(int idIntern) {
+        return internRepository.deleteIntern(idIntern);
+    }
 }

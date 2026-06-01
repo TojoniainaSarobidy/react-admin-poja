@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import javax.xml.transform.Result;
+
 @Repository
 public class EmployeeRepository {
     public List<Employee> getAllEmployees() {
@@ -70,6 +72,53 @@ public class EmployeeRepository {
             throw new RuntimeException(e);
         } finally {
             dbConnection.getCloseConnection(connection);
+        }
+    }
+
+    public Employee updateEmployee(Employee employee) {
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = dbConnection.getDBConnection();
+        try {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE employee SET firstname = ?, lastname = ?, email = ?, department = ?, salary = ?, active = ? WHERE id = ? RETURNING id"
+            )) {
+                preparedStatement.setString(1, employee.getFirstname());
+                preparedStatement.setString(2, employee.getLastname());
+                preparedStatement.setString(3, employee.getEmail());
+                preparedStatement.setString(4, employee.getDepartment());
+                preparedStatement.setDouble(5, employee.getSalary());
+                preparedStatement.setBoolean(6, employee.getActive());
+                preparedStatement.setInt(7, employee.getId());
+                try (ResultSet resultSet = preparedStatement.executeQuery();) {
+                    if (resultSet.next()) {
+                        resultSet.getInt("id");
+                    }
+                    connection.commit();
+                    return employee;
+                }
+            } catch (SQLException e) {
+                connection.rollback();
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            dbConnection.getCloseConnection(connection);
+        }
+    }
+
+    public String deleteEmployee(int idEmployee) {
+        DBConnection dbConnection = new DBConnection();
+        try (Connection connection = dbConnection.getDBConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "DELETE FROM employee WHERE id = ?"
+             )) {
+            preparedStatement.setInt(1, idEmployee);
+            preparedStatement.executeUpdate();
+            return "Employee deleted successfully";
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
